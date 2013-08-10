@@ -1,0 +1,47 @@
+/**************************************************************************
+* @author Jason Altschuler
+*
+* Description of Otsu.Java
+***************************************************************************/
+
+  ** PURPOSE: Finds optimal threshold between foreground and background
+   pixels in images using Otsu's Method.
+
+
+  ** OVERVIEW:
+      Step 1. Create histogram of pixel intensities from the image.
+      Step 2. Find the pixel intensity that maximizes the cost function
+      (defined below). Set this pixel intensity as the threshold.
+
+
+  ** RUN-TIME ANALYSIS: (N = # of pixels, RADIX = max_pixel_intensity + 1)
+      Step 1: O(N)
+      Step 2: O(1). Note: more generally, this should be O(RADIX), but we take
+      advantage of the fact that for BufferedImages in Java, pixel intensities
+      range from 0 to 255. So RADIX can be safely set to the constant 256.
+      Overall: O(N)
+
+
+  ** COST FUNCTION: maximize var_between_classes, where:
+
+weight_BG(T) = sum p(i) for i = 0 to T-1
+weight_FG(T) = sum p(i) for i = T to N-1
+
+mean_BG(T) = [sum(i * p(i))] / weight_BG(T) for i = 0 to T-1
+mean_FG(T) = [sum(i * p(i))] / weight_FG(T) for i = T to N-1
+
+var_between_classes = weight_FG(T) * weight_BG(T) * [mean_FG(T) - mean_BG(T)]^2
+
+
+  ** EXAMPLE RUN: (a full example is provided in main method)
+BufferedImage image = User.provideImage();               // you need to provide
+Otsu o = new Otsu(image);
+int threshold = o.getThreshold();
+BufferedImage img = Otsu.applyThreshold(image, threshold);
+User.do_something_awesome_with_the_data();               // enjoy!
+
+
+  ** SUGGESTED READINGS:
+      1. http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/MORSE/threshold.pdf
+      2. http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html
+      3. http://en.wikipedia.org/wiki/Otsu's_method
