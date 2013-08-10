@@ -24,13 +24,13 @@
 
   ** COST FUNCTION: maximize var_between_classes, where:
 
-weight_BG(T) = sum p(i) for i = 0 to T-1
-weight_FG(T) = sum p(i) for i = T to N-1
+weight_BG(T) := sum p(i) for i = 0 to T-1
+weight_FG(T) := sum p(i) for i = T to N-1
 
-mean_BG(T) = [sum(i * p(i))] / weight_BG(T) for i = 0 to T-1
-mean_FG(T) = [sum(i * p(i))] / weight_FG(T) for i = T to N-1
+mean_BG(T) := [sum(i * p(i))] / weight_BG(T) for i = 0 to T-1
+mean_FG(T) := [sum(i * p(i))] / weight_FG(T) for i = T to N-1
 
-var_between_classes = weight_FG(T) * weight_BG(T) * [mean_FG(T) - mean_BG(T)]^2
+var_between_classes := weight_FG(T) * weight_BG(T) * [mean_FG(T) - mean_BG(T)]^2
 
 
   ** EXAMPLE RUN: (a full example is provided in main method)
