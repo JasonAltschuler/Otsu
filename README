@@ -34,11 +34,14 @@ var_between_classes := weight_FG(T) * weight_BG(T) * [mean_FG(T) - mean_BG(T)]^2
 
 
   ** EXAMPLE RUN: (a full example is provided in main method)
-BufferedImage image = User.provideImage();               // User needs to provide
+
+BufferedImage image = User.provideImage();
 Otsu o = new Otsu(image);
 int threshold = o.getThreshold();
 BufferedImage img = Otsu.applyThreshold(image, threshold);
-User.do_something_awesome_with_the_data();               // enjoy!
+User.do_something_awesome_with_the_data();
+
+// enjoy!
 
 
   ** SUGGESTED READINGS:
