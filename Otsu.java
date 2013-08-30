@@ -6,61 +6,51 @@
  * PURPOSE: Finds optimal threshold between foreground and background pixels
  * in images.
  *
- * ALGORITHM: Otsu's Method.
+ * ALGORITHM: Otsu's Method (also called "Optimal Global Threshold Calculator")
  *
  * RUN TIME: O(N) where N is the number of pixels in the image.
  *
  * For full documentation, see README
  *****************************************************************************/
 
-// TODO: speed check against MATLAB
-
-package otsu;
+package threshold;
 
 import grayscale.Grayscale;
-import imageio.ImageViewer;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
+
+import ui.ImageViewer;
+import util.Threshold;
 
 
-public class Otsu {
-   // pixel intensities range from 0 to 255, inclusive, in BufferedImages
-   private final static int RADIX = 256;
-
-   /***********************************************************************
-    * Fields
-    **********************************************************************/
-   // Foreground pixels >= threshold; background pixels < threshold
-   private int threshold;
-
+public class Otsu extends GlobalThresholding {
+   
    /***********************************************************************
     * Constructors
     **********************************************************************/
 
    /**
-    * Finds optimal FG/BG threshold for a BufferedImage.
+    * Finds optimal global FG/BG threshold for a BufferedImage.
     * <P> All work is done in constructor.
     * @param image
     */
    public Otsu(BufferedImage image) {
-      int[][] pixels = Grayscale.getGrayPixels(image);
-      run(pixels);
+      int[][] pixels = Grayscale.imgToGrayPixels(image);
+      threshold(pixels);
    }
 
 
    /**
-    * Finds optimal FG/BG threshold for array of grayscale pixel intensities.
+    * Finds optimal global FG/BG threshold for array of grayscale pixel intensities.
     * <P> All work is done in constructor.
     * @param pixels
     */
    public Otsu(int[][] pixels) {
-      run(pixels);
+      threshold(pixels);
     }
 
    /***********************************************************************
@@ -71,7 +61,7 @@ public class Otsu {
     * Runs Otsu's method.
     * @param pixels
     */
-   private void run(int[][] pixels) {
+   protected void threshold(int[][] pixels) {
       // create a histogram out of the pixels
       int[] n_t = histogram(pixels);
 
@@ -82,6 +72,7 @@ public class Otsu {
       calcThreshold(n_t, pixels.length * pixels[0].length, sum);
    }
 
+   
    /**
     * Creates a histogram out of the pixels.
     * <P> Run-time: O(N) where N is the number of pixels.
@@ -154,14 +145,7 @@ public class Otsu {
       }
    }
 
-
-   /***********************************************************************
-    * Accessors
-    **********************************************************************/
-   public int getThreshold() {
-      return threshold;
-   }
-
+   
    /***********************************************************************
     * Unit testing
     ***********************************************************************/
@@ -174,32 +158,7 @@ public class Otsu {
     * @return
     */
    private static BufferedImage applyThreshold(int[][] pixels, int threshold) {
-      int width = pixels.length;
-      int height = pixels[0].length;
-
-      BufferedImage thresholdedImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-      WritableRaster raster = thresholdedImage.getRaster();
-
-      int[] black = {0, 0, 0};
-      int[] white = {255, 255, 255};
-
-      for (int row = 0; row < height; row++)
-         for (int col = 0; col < width; col++)
-            raster.setPixel(col, row, pixels[col][row] > threshold ? white : black);
-
-      return thresholdedImage;
-   }
-
-   /**
-    * Displays images side by side.
-    * @param images
-    */
-   private static void showImages(BufferedImage[] images) {
-      ImageViewer gui = new ImageViewer(images);
-      gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      gui.setVisible(true);
-      gui.pack();
-      gui.setTitle("Otsu's Method by Jason Altschuler");
+      return Threshold.applyThreshold(pixels, threshold);
    }
 
    /**
@@ -211,8 +170,8 @@ public class Otsu {
       // read image and get pixels
       String img = args[0];
       BufferedImage originalImage = ImageIO.read(new File(img));
-      int[][] pixels = Grayscale.getGrayPixels(originalImage);
-
+      int[][] pixels = Grayscale.imgToGrayPixels(originalImage);
+      
       // run Otsu's
       final long startTime = System.currentTimeMillis();
       Otsu otsu = new Otsu(pixels);
@@ -226,7 +185,10 @@ public class Otsu {
 
       // display thresholded image
       BufferedImage thresholdedImage = applyThreshold(pixels, threshold);
-      BufferedImage grayscaleImage = Grayscale.convertUsingJava(originalImage);
-      showImages(new BufferedImage[] {originalImage, grayscaleImage, thresholdedImage});
+      BufferedImage grayscaleImage = Grayscale.toGray(originalImage);
+     
+      BufferedImage[] toShow = {originalImage, grayscaleImage, thresholdedImage};
+      String title = "Otsu's method by Jason Altschuler";
+      ImageViewer.showImages(toShow, title, 2, 2);
    }
 }
